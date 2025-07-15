@@ -55,35 +55,32 @@ class Site:
 
             self.news = news_dict_veja
             news_dict_veja
-
-        if self.site.lower() == 'cnn':
+        if self.opcao.lower() == 'cnn':
             url = 'https://www.cnnbrasil.com.br/'
             browsers = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 \(KHTML, like Gecko) Chrome / 86.0.4240.198Safari / 537.36"}
-            page = requests.get(url, headers=browsers)
-            
+            page = requests.get(url, headers = browsers)
+
             resposta = page.text
             soup = BeautifulSoup(resposta, 'html.parser')
             noticias = soup.find_all('a')
 
-            tg_class1 = 'font-bold.flex.group-has-[.featured-media]:md:text-3xl.md:text-4xl.text-2xl.w-11/12.md:w-full'
-            tg_class2 = 'text-base.font-normal.max-w-full.whitespace-break-spaces.text-wrap.text-inherit'
-            tg_class3 = 'text-base.font-bold.flex.w-fit'
-            tg_class4 = 'text-sm.font-normal.text-gray-600.hover:underline'
-            tg_class5 = 'font-medium.xl:text-2xl.text-xl'
-
+            target_class_1 = 'headline__primary_title'
+            target_class_2 = 'home__title'
+            target_class_3 = 'articles__title'
+            target_class_4 = 'webstories_title'
             news_dict_cnn = {}
+
             for i in range(len(noticias)):
-                if (noticias[i].h2 != None) and (noticias[i].h2.get('class') != None) and (tg_class1 in noticias[i].h2.get('class')):
+                if (noticias[i].h2 != None) and (noticias[i].h2.get('class') != None) and (target_class_1 in noticias[i].h2.get('class')):
                     news_dict_cnn[noticias[i].h2.text] = noticias[i].get('href')
                 if noticias[i].h3 != None and (noticias[i].h3.get('class') != None):
-                    if tg_class2 in noticias[i].h3.get('class'):
+                    if target_class_2 in noticias[i].h3.get('class'):
                         news_dict_cnn[noticias[i].h3.text] = noticias[i].get('href')
-                    if tg_class3 in noticias[i].h3.get('class'):
+                    if target_class_3 in noticias[i].h3.get('class'):
                         news_dict_cnn[noticias[i].h3.text] = noticias[i].get('href')
-                    if tg_class4 in noticias[i].h3.get('class'):
+                    if target_class_4 in noticias[i].h3.get('class'):
                         news_dict_cnn[noticias[i].h3.text] = noticias[i].get('href')
-                    if tg_class5 in noticias[i].h3.get('class'):
-                        news_dict_cnn[noticias[i].h3.text] = noticias[i].get('href')
+
             self.news = news_dict_cnn
             news_dict_cnn
 
