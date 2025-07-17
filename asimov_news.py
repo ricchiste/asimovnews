@@ -16,6 +16,8 @@ class AsimovNews:
 
         self.screen = 0
         self.kill = False
+        self.page = 1
+
         self.news = self._read_file('news') if 'news' in os.listdir() else []
         self._update_file(self.news, 'news')
         self.sites = self._read_file('sites') if 'sites' in os.listdir() else []
@@ -72,7 +74,6 @@ class AsimovNews:
         command = 0 if command == '' else command
         return command
 
-
     def main_loop(self):
         while True:
             os.system('cls' if os.name =='nt' else 'clear')
@@ -88,7 +89,23 @@ class AsimovNews:
 
 
                 case 1:
-                    pass
+                    self.display_news()
+                    command = self._receive_command(['p', 'a', 'l', 'v'], 5)
+                    match command:
+                        case 'p':
+                            if self.page < self.max_page: self.page += 1
+                        case 'a':
+                            if self.page > 1: self.page -= 1
+                        case 'l':
+                            link = int(input('>> Insira o número da matéria que deseja abrir: '))
+                            if link <1 or link > len(self.filtered_news):
+                                print('Matéria inexistente')
+                            else:
+                                webbrowser.open(self.filtered_news[link-1]['link'])
+                        case 'v':
+                            self.screen = 0
+                            continue
+
                 case 2:
                     os.system('cls' if os.name == 'nt' else 'clear')
                     print('Digite um número do site que deseja adicionar para a lista de sites ativos. \nPressione 0 para voltar par ao menu.')
@@ -123,6 +140,23 @@ class AsimovNews:
                     self.kill = True
                     sys.exit()
 
+    def display_news(self):
+        os.system('cls' if os.name =='nt' else 'clear')
+        print(f'último update: {datetime.now().strftime('%Y-%m-%d - %H:%M:%S')}')
+
+        self.filtered_news = [i for i in self.news if i['fonte'] in self.sites]
+        self.max_page = ceil(len(self.filtered_news)/20)
+
+        if self.page > self.max_page: self.page = 1
+
+        constante = (self.page - 1) * 10
+
+        for i, article in enumerate(self.filtered_news[constante:constante+10]):
+            print(f"{constante+i}. {article['data'].strftime('%d/%m/%Y %H:%M')} - {article['fonte'].upper()} - {article['materia']}")
+        print(f'Page {self.page}/{self.max_page}')
+        print('=============================================================')
+        print('Comandos:')
+        print('P - Próxima página | A - Página anterior | L - Abrir materia no navegador | V - Voltar')
                 
 self = AsimovNews()
 self.main_loop()
